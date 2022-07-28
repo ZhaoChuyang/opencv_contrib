@@ -254,15 +254,106 @@ namespace cv{
     void colorJitter(InputArray _src, OutputArray _dst, const Vec2d& brightness, const Vec2d& contrast, const Vec2d& saturation, const Vec2d& hue){
         // TODO: check input values
         RNG rng = RNG(getTickCount());
-        double brightness_factor = rng.uniform(brightness[0], brightness[1]);
-        double contrast_factor = rng.uniform(contrast[0], contrast[1]);
-        double saturation_factor = rng.uniform(saturation[0], saturation[1]);
-        double hue_factor = rng.uniform(hue[0], hue[1]);
 
         Mat src = _src.getMat();
-        adjust_brightness(src, 1);
 
+        double brightness_factor, contrast_factor, saturation_factor, hue_factor;
+
+        if(brightness != Vec2d())
+            brightness_factor = rng.uniform(brightness[0], brightness[1]);
+        if(contrast != Vec2d())
+            contrast_factor = rng.uniform(contrast[0], contrast[1]);
+        if(saturation != Vec2d())
+            saturation_factor = rng.uniform(saturation[0], saturation[1]);
+        if(hue != Vec2d())
+            hue_factor = rng.uniform(hue[0], hue[1]);
+
+        int order[4] = {1,2,3,4};
+        std::random_shuffle(order, order+4);
+
+        for(int i : order){
+            if(i == 1 && brightness != Vec2d())
+                adjust_brightness(src, brightness_factor);
+            if(i == 2 && contrast != Vec2d())
+                adjust_contrast(src, contrast_factor);
+            if(i == 3 && saturation != Vec2d())
+                adjust_saturation(src, saturation_factor);
+            if(i == 4 && hue != Vec2d())
+                adjust_hue(src, hue_factor);
+        }
+
+        _dst.move(src);
     }
 
+    ColorJitter::ColorJitter(const Vec2d &brightness, const Vec2d &contrast, const Vec2d &saturation,
+                             const Vec2d &hue):
+                             brightness(brightness),
+                             contrast(contrast),
+                             saturation(saturation),
+                             hue(hue){};
+
+    void ColorJitter::call(InputArray src, OutputArray dst) const{
+        colorJitter(src, dst, brightness, contrast, saturation, hue);
+    }
+
+    void randomRotation(InputArray _src, OutputArray _dst, const Vec2d& degrees, int interpolation, bool expand, const Point2f& center, int fill){
+        Mat src = _src.getMat();
+        RNG rng = RNG(getTickCount());
+        // TODO: check the validation of degrees
+        double angle = rng.uniform(degrees[0], degrees[1]);
+
+        Point2f pt(src.cols/2., src.rows/2.);
+        if(center == Point2f()) pt = center;
+        Mat r = getRotationMatrix2D(pt, angle, 1.0);
+        // TODO: auto expand dst size to fit the rotated image
+        warpAffine(src, _dst, r, Size(src.cols, src.rows), interpolation, BORDER_CONSTANT, fill);
+    }
+
+    RandomRotation::RandomRotation(const Vec2d& degrees, int interpolation, bool expand, const Point2f& center, int fill):
+        degrees(degrees),
+        interpolation(interpolation),
+        expand(expand),
+        center(center),
+        fill(fill){};
+
+    void RandomRotation::call(InputArray src, OutputArray dst) const{
+        randomRotation(src, dst, degrees, interpolation, expand, center, fill);
+    }
+
+    void grayScale(InputArray _src, OutputArray _dst, int num_channels){
+        Mat src = _src.getMat();
+        cvtColor(src, src, COLOR_BGR2GRAY);
+
+        if(num_channels == 1){
+            _dst.move(src);
+            return;
+        }
+        Mat channels[3] = {src, src, src};
+        merge(channels, 3, _dst);
+    }
+
+    GrayScale::GrayScale(int num_channels):
+        num_channels(num_channels){};
+
+    void GrayScale::call(InputArray _src, OutputArray _dst) const{
+        grayScale(_src, _dst, num_channels);
+    }
+
+    void randomGrayScale(InputArray _src, OutputArray _dst, double p){
+        RNG rng = RNG(getTickCount());
+        if(rng.uniform(0.0, 1.0) < p){
+            grayScale(_src, _dst, _src.channels());
+            return;
+        }
+        Mat src = _src.getMat();
+        _dst.move(src);
+    }
+
+    RandomGrayScale::RandomGrayScale(double p):
+        p(p){};
+
+    void RandomGrayScale::call(InputArray src, OutputArray dst) const{
+        randomGrayScale(src, dst);
+    }
 
 }

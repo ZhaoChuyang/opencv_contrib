@@ -102,6 +102,49 @@ namespace cv{
 
     CV_EXPORTS void colorJitter(InputArray src, OutputArray dst, const Vec2d& brightness=Vec2d(), const Vec2d& contrast=Vec2d(), const Vec2d& saturation=Vec2d(), const Vec2d& hue=Vec2d());
 
+    class CV_EXPORTS_W ColorJitter : public Transform {
+    public:
+        CV_WRAP explicit ColorJitter(const Vec2d& brightness=Vec2d(), const Vec2d& contrast=Vec2d(), const Vec2d& saturation=Vec2d(), const Vec2d& hue=Vec2d());
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        Vec2d brightness;
+        Vec2d contrast;
+        Vec2d saturation;
+        Vec2d hue;
+    };
+
+    CV_EXPORTS void randomRotation(InputArray src, OutputArray dst, const Vec2d& degrees, int interpolation=INTER_NEAREST, bool expand=false, const Point2f& center=Point2f(), int fill=0);
+
+    class CV_EXPORTS_W RandomRotation : public Transform {
+    public:
+        CV_WRAP explicit RandomRotation(const Vec2d& degrees, int interpolation=INTER_NEAREST, bool expand=false, const Point2f& center=Point2f(), int fill=0);
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        Vec2d degrees;
+        int interpolation;
+        bool expand;
+        Point2f center;
+        int fill;
+    };
+
+    class CV_EXPORTS_W GrayScale : public Transform {
+    public:
+        CV_WRAP explicit GrayScale(int num_channels=1);
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        int num_channels;
+    };
+
+    CV_EXPORTS void randomGrayScale(InputArray src, OutputArray dst, double p=0.1);
+
+    class CV_EXPORTS_W RandomGrayScale : public Transform {
+    public:
+        CV_WRAP explicit RandomGrayScale(double p=0.1);
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        double p;
+    };
+
 }
 
 #endif

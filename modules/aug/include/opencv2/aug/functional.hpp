@@ -9,7 +9,7 @@ namespace cv {
 //
 //    }
 
-    void adjust_brightness(Mat& img, float brightness_factor){
+    void adjust_brightness(Mat& img, double brightness_factor){
         CV_Assert(brightness_factor >= 0);
 
         int channels = img.channels();
