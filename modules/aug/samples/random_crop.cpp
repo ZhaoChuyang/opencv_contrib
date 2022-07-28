@@ -17,11 +17,9 @@ void test_randomFlip(cv::Mat src, cv::Mat& dst){
 }
 
 int main(int argv, char** argc) {
-    const char* filename = argc[1];
+    std::string filename = "/Users/chuyang/Development/opencv/samples/data/lena.jpg";
     cv::Mat src = cv::imread(filename);
     cv::Mat dst;
-
-
 
 //    cv::imshow("lena.png", dst);
 //    cv::waitKey(0);
