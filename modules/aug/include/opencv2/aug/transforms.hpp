@@ -7,6 +7,7 @@
 
 namespace cv{
 
+
     /*
      * Base class for all augmentation classes
      */
@@ -143,6 +144,58 @@ namespace cv{
         CV_WRAP void call(InputArray src, OutputArray dst) const override;
 
         double p;
+    };
+
+    CV_EXPORTS void randomErasing(InputArray src, OutputArray dst, double p=0.5, const Vec2d& scale=Vec2d(0.02, 0.33), const Vec2d& ratio=Vec2d(0.3, 0.33), const Scalar& value=Scalar(0, 100, 100), bool inplace=false);
+
+    class CV_EXPORTS_W RandomErasing : public Transform {
+    public:
+        CV_WRAP explicit RandomErasing(double p=0.5, const Vec2d& scale=Vec2d(0.02, 0.33), const Vec2d& ratio=Vec2d(0.3, 0.33), const Scalar& value=Scalar(0, 100, 100), bool inplace=false);
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        double p;
+        Vec2d scale;
+        Vec2d ratio;
+        Scalar value;
+        bool inplace;
+    };
+
+    // NOTE: After normalizing, data are represented as 32-bit float in range(0,1)
+    class CV_EXPORTS_W Normalize : public Transform {
+    public:
+        CV_WRAP explicit Normalize(const Scalar& mean=Scalar(0,0,0,0), const Scalar& std=Scalar(1,1,1,1));
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        Scalar mean;
+        Scalar std;
+    };
+
+    CV_EXPORTS void gaussianBlur(InputArray src, OutputArray dst, const Size& kernel_size, const Vec2f& sigma=Vec2f(0,1, 2.0));
+
+    class CV_EXPORTS_W GaussianBlurAug : public Transform {
+    public:
+        CV_WRAP explicit GaussianBlurAug(const Size& kernel_size, const Vec2f& sigma=Vec2f(0,1, 2.0));
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        Size kernel_size;
+        Vec2f sigma;
+    };
+
+    CV_EXPORTS void randomAffine(InputArray src, OutputArray dst, const Vec2f& degrees=Vec2f(0., 0.), const Vec2f& translations=Vec2f(0., 0.), const Vec2f& scales=Vec2f(1., 1.), const Vec4f& shears=Vec4f(0., 0., 0., 0.), int interpolation=INTER_NEAREST, const Scalar& fill=Scalar(), const Point2i& center=Point2i(-1, -1));
+
+    class CV_EXPORTS_W RandomAffine: public Transform{
+    public:
+        CV_WRAP explicit RandomAffine(const Vec2f& degrees=Vec2f(0., 0.), const Vec2f& translations=Vec2f(0., 0.), const Vec2f& scales=Vec2f(1., 1.), const Vec4f& shears=Vec4f(0., 0., 0., 0.), int interpolation=INTER_NEAREST, const Scalar& fill=Scalar(), const Point2i& center=Point2i(-1, -1));
+        CV_WRAP void call(InputArray src, OutputArray dst) const override;
+
+        Vec2f degrees;
+        Vec2f translations;
+        Vec2f scales;
+        Vec4f shears;
+        int interpolation;
+        Scalar fill;
+        Point2i center;
+
     };
 
 }

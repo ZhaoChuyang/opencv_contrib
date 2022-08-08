@@ -1,10 +1,14 @@
 #include "precomp.hpp"
 #include <opencv2/highgui.hpp>
+#include <iostream>
 
 namespace cv{
 
     static void getRandomCropParams(int h, int w, int th, int tw, int* x, int* y);
     static void getRandomResizedCropParams(int height, int width, const Vec2d& scale, const Vec2d& ratio, Rect& rect);
+    static void getRandomErasingCropParams(int height, int width, const Vec2d& scale, const Vec2d& ratio, Rect& rect);
+    static void getRandomAffineParams(const Size& size, const Vec2f& degrees, const Vec2f& translations, const Vec2f& scales, const Vec4f& shears, float* angle, float* translation_x, float* translation_y, float* scale, float* shear_x, float* shear_y);
+    static void getAffineMatrix(Mat mat, float angle, float tx, float ty, float scale, float shear_x, float shear_y, int cx, int cy);
 
     // NOTE: cv::randomCrop or randomCrop?
     void randomCrop(InputArray _src, OutputArray _dst, const Size& sz, const Vec4i& padding, bool pad_if_need, int fill, int padding_mode){
@@ -354,6 +358,223 @@ namespace cv{
 
     void RandomGrayScale::call(InputArray src, OutputArray dst) const{
         randomGrayScale(src, dst);
+    }
+
+    void randomErasing(InputArray _src, OutputArray _dst, double p, const Vec2d& scale, const Vec2d& ratio, const Scalar& value, bool inplace){
+        // TODO: check the range of input values
+        // TODO: currently inplace takes no effect
+        RNG rng = RNG(getTickCount());
+        Mat src = _src.getMat();
+        if(rng.uniform(0., 1.) >= p){
+            _dst.move(src);
+            return;
+        }
+
+        Rect roi;
+        getRandomErasingCropParams(src.rows, src.cols, scale, ratio, roi);
+
+        Mat erased(src, roi);
+
+        int rows = erased.rows;
+        int cols = erased.cols;
+        int cn = erased.channels();
+        for(int j=0; j<rows; j++){
+            uchar* row = erased.ptr<uchar>(j);
+            for(int i=0; i<cols; i++){
+                for(int c=0; c<cn; c++){
+                    row[i * cn + c] = value[c];
+                }
+            }
+        }
+
+        _dst.move(src);
+
+    }
+
+    static void getRandomErasingCropParams(int height, int width, const Vec2d& scale, const Vec2d& ratio, Rect& rect) {
+        int area = height * width;
+
+        // initialize random value generator
+        RNG rng = RNG(getTickCount());
+
+        for (int i = 0; i < 10; i++) {
+            double target_area = rng.uniform(scale[0], scale[1]) * area;
+            double aspect_ratio = rng.uniform(ratio[0], ratio[1]);
+
+            int w = static_cast<int>(round(sqrt(target_area * aspect_ratio)));
+            int h = static_cast<int>(round(sqrt(target_area / aspect_ratio)));
+
+            if (w > 0 && w <= width && h > 0 && h <= height) {
+                rect.x = rng.uniform(0, width - w + 1);
+                rect.y = rng.uniform(0, height - h + 1);
+                rect.width = w;
+                rect.height = h;
+                return;
+            }
+        }
+
+        // Center Crop
+        double in_ratio = static_cast<double>(width) / height;
+        if (in_ratio < ratio[0]) {
+            rect.width = width;
+            rect.height = static_cast<int> (round(width / ratio[0]));
+        }
+        else if (in_ratio > ratio[1]) {
+            rect.height = height;
+            rect.width = static_cast<int> (round(height * ratio[1]));
+        }
+        else {
+            rect.width = width;
+            rect.height = height;
+        }
+        rect.x = (width - rect.width) / 2;
+        rect.y = (height - rect.height) / 2;
+    }
+
+    RandomErasing::RandomErasing(double p, const Vec2d &scale, const Vec2d &ratio, const Scalar &value, bool inplace):
+        p(p),
+        scale(scale),
+        ratio(ratio),
+        value(value),
+        inplace(inplace){};
+
+    void RandomErasing::call(InputArray src, OutputArray dst) const{
+        randomErasing(src, dst, p, scale, ratio, value, inplace);
+    }
+
+    // NOTE: because Scalar contains 4 elements at most, normalize can only apply to image with channels no more than 4.
+    Normalize::Normalize(const Scalar &mean, const Scalar &std):
+    mean(mean),
+    std(std){};
+
+    void Normalize::call(InputArray _src, OutputArray _dst) const{
+
+        Mat src = _src.getMat();
+        int cn = src.channels();
+        std::vector<Mat> channels;
+        split(src, channels);
+
+        // normalize each channel to 0-1 first
+        for(int i=0; i<cn; i++){
+            Mat dst;
+            normalize(channels[i], dst, 0, 1, NORM_MINMAX, CV_32F);
+            dst = (dst - mean[i])/std[i];
+            channels[i] = dst;
+        }
+
+        merge(channels, _dst);
+
+    }
+
+    void gaussianBlur(InputArray src, OutputArray dst, const Size& kernel_size, const Vec2f& sigma){
+        RNG rng = RNG(getTickCount());
+        float sigmaX = rng.uniform(sigma[0], sigma[1]);
+        GaussianBlur(src, dst, kernel_size, sigmaX);
+    }
+
+    GaussianBlurAug::GaussianBlurAug(const Size &kernel_size, const Vec2f &sigma):
+        kernel_size(kernel_size),
+        sigma(sigma){};
+
+    void GaussianBlurAug::call(InputArray src, OutputArray dst) const{
+        gaussianBlur(src, dst, kernel_size, sigma);
+    }
+
+    void randomAffine(InputArray _src, OutputArray _dst, const Vec2f& degrees, const Vec2f& translations, const Vec2f& scales, const Vec4f& shears, int interpolation, const Scalar& fill, const Point2i& _center){
+        /*
+         * M = T * R * SHx * SHy
+         * T is the translation matrix: [1, 0, tx | 0, 1, ty | 0, 0, 1]
+         * R is the rotation matrix: [ s * cos(a), s * sin(a), (1 - s * cos(a)) * cx - s * sin(a) * cy | -s * sin(a), s * cos(a), s * sin(a) * cx + (1 - s * cos(a)) * cy | 0, 0, 1]
+         * in which cx and cy are center coordinates to keep the image rotate around the center, s is the scale factor, a is the rotation angle.
+         * SHx and SHy are shear matrices: SHx(s) = [1, -tan(s), 0 | 0, 1, 0 | 0, 0, 1], SHy(s) = [1, 0, 0 | -tan(s), 1, 0 | 0, 0, 1]
+         */
+
+        // TODO: check the input value ranges
+        Mat src = _src.getMat();
+        // when center is default (-1,-1), make the rotation center located in the center of the image
+        Point2i center;
+        if(_center == Point2i(-1, -1)){
+            center.x = static_cast<int>(src.cols / 2);
+            center.y = static_cast<int>(src.rows / 2);
+        }else{
+            center = _center;
+        }
+
+        float angle, translation_x, translation_y, scale, shear_x, shear_y;
+        getRandomAffineParams(src.size(), degrees, translations, scales, shears, &angle, &translation_x, &translation_y, &scale, &shear_x, &shear_y);
+
+        Mat affine_matrix = Mat::eye(2, 3, CV_32F);
+
+        // TODO: check whether equations are right
+        getAffineMatrix(affine_matrix, angle, translation_x, translation_y, scale, shear_x, shear_y, center.x, center.y);
+        warpAffine(src, src, affine_matrix, src.size(), interpolation, BORDER_CONSTANT, fill);
+        _dst.move(src);
+    }
+
+    static void getAffineMatrix(Mat mat, float angle, float tx, float ty, float scale, float shear_x, float shear_y, int cx, int cy){
+        float* data = mat.ptr<float>(0);
+
+        // convert from degree to radians
+        angle = (CV_PI * angle) / 180;
+        shear_x = (CV_PI * shear_x) / 180;
+        shear_y = (CV_PI * shear_y) / 180;
+
+        data[0] = scale * cos(angle - shear_y) / cos(shear_y);
+        data[1] = scale * (-cos(angle - shear_y) * tan(shear_x) / cos(shear_y) - sin(angle));
+        data[3] = scale * sin(angle - shear_y) / cos(shear_y);
+        data[4] = scale * (-sin(angle - shear_y) * tan(shear_x) / cos(shear_y) + cos(angle));
+        data[2] = cx * (1-data[0]) + data[1] * (-cy) + tx;
+        data[5] = cy * (1-data[4]) + data[3] * (-cx) + ty;
+    }
+
+    static void getRandomAffineParams(const Size& size, const Vec2f& degrees, const Vec2f& translations, const Vec2f& scales, const Vec4f& shears, float* angle, float* translation_x, float* translation_y, float* scale, float* shear_x, float* shear_y){
+        RNG rng = RNG(getTickCount());
+
+        if(degrees == Vec2f(0, 0)) {
+            *angle = 0;
+        }
+        else{
+            *angle = rng.uniform(degrees[0], degrees[1]);
+        }
+
+        if(translations == Vec2f(0, 0)) {
+            *translation_x = 0;
+            *translation_y = 0;
+        }
+        else{
+            *translation_x = rng.uniform(-translations[0], translations[0]) * size.width;
+            *translation_y = rng.uniform(-translations[1], translations[1]) * size.height;
+        }
+
+        if(scales == Vec2f(1, 1)) {
+            *scale = 1;
+        }
+        else{
+            *scale = rng.uniform(scales[0], scales[1]);
+        }
+
+        if(shears == Vec4f(0, 0, 0, 0)) {
+            *shear_x = 0;
+            *shear_y = 0;
+        }
+        else{
+            *shear_x = rng.uniform(shears[0], shears[1]);
+            *shear_y = rng.uniform(shears[2], shears[3]);
+        }
+
+    }
+
+    RandomAffine::RandomAffine(const Vec2f& degrees, const Vec2f& translations, const Vec2f& scales, const Vec4f& shears, int interpolation, const Scalar& fill, const Point2i& center):
+            degrees(degrees),
+            translations(translations),
+            scales(scales),
+            shears(shears),
+            interpolation(interpolation),
+            fill(fill),
+            center(center){};
+
+    void RandomAffine::call(InputArray src, OutputArray dst) const{
+        randomAffine(src, dst, degrees, translations, scales, shears, interpolation, fill, center);
     }
 
 }
