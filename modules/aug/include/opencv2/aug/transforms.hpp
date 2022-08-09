@@ -170,11 +170,11 @@ namespace cv{
         Scalar std;
     };
 
-    CV_EXPORTS void gaussianBlur(InputArray src, OutputArray dst, const Size& kernel_size, const Vec2f& sigma=Vec2f(0,1, 2.0));
+    CV_EXPORTS void gaussianBlur(InputArray src, OutputArray dst, const Size& kernel_size, const Vec2f& sigma=Vec2f(0.1, 2.0));
 
     class CV_EXPORTS_W GaussianBlurAug : public Transform {
     public:
-        CV_WRAP explicit GaussianBlurAug(const Size& kernel_size, const Vec2f& sigma=Vec2f(0,1, 2.0));
+        CV_WRAP explicit GaussianBlurAug(const Size& kernel_size, const Vec2f& sigma=Vec2f(0.1, 2.0));
         CV_WRAP void call(InputArray src, OutputArray dst) const override;
 
         Size kernel_size;
