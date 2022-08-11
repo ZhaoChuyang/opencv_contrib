@@ -15,20 +15,50 @@ namespace cv{
 
         class CV_EXPORTS_W Compose{
         public:
-            CV_WRAP explicit Compose(std::vector<Ptr<Transform> >& transforms);
+            CV_WRAP explicit Compose(std::vector<cv::Ptr<cv::det::Transform> >& transforms);
             CV_WRAP void call(InputArray src, OutputArray dst, std::vector<cv::Rect>& target) const;
 
-            std::vector<Ptr<Transform> > transforms;
+            std::vector<cv::Ptr<cv::det::Transform> > transforms;
         };
 
-        class CV_EXPORTS_W RandomFlip{
+        class CV_EXPORTS_W RandomFlip: cv::det::Transform{
         public:
-            CV_WRAP RandomFlip(int flipCode=0, float p=0.5);
+            CV_WRAP explicit RandomFlip(int flipCode=0, float p=0.5);
             CV_WRAP void call(InputArray src, OutputArray dst, std::vector<cv::Rect>& target) const;
             void flipBoundingBox(std::vector<cv::Rect>& target, const Size& size) const;
 
             int flipCode;
             float p;
+        };
+
+//        class CV_EXPORTS_W RandomCrop: cv::det::Transform{
+//        public:
+//            CV_WRAP explicit RandomCrop(const Size& sz, const Vec4i& padding=Vec4i() , bool pad_if_need=false, const Scalar& fill=Scalar(), int padding_mode=BORDER_CONSTANT);
+//            CV_WRAP void call(InputArray src, OutputArray dst, std::vector<cv::Rect>& target) const;
+//
+//            const Size sz;
+//            Vec4i padding;
+//            bool pad_if_need;
+//            Scalar fill;
+//            int padding_mode;
+//        };
+
+        class CV_EXPORTS_W Resize: cv::det::Transform{
+        public:
+            CV_WRAP explicit Resize(const Size& size, int interpolation=INTER_NEAREST);
+            CV_WRAP void call(InputArray src, OutputArray dst, std::vector<cv::Rect>& target) const;
+            void resizeBoundingBox(std::vector<cv::Rect>& target, const Size& imgSize) const;
+
+            const Size size;
+            int interpolation;
+        };
+
+        class CV_EXPORTS_W Convert: cv::det::Transform{
+        public:
+            CV_WRAP explicit Convert(int code);
+            CV_WRAP void call(InputArray src, OutputArray dst, std::vector<cv::Rect>& target) const;
+
+            int code;
         };
     }
 }

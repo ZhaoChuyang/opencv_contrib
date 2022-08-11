@@ -9,7 +9,7 @@ namespace cv {
 //
 //    }
 
-    void adjust_brightness(Mat& img, double brightness_factor){
+    static void adjust_brightness(Mat& img, double brightness_factor){
         CV_Assert(brightness_factor >= 0);
 
         int channels = img.channels();
@@ -27,7 +27,7 @@ namespace cv {
 //        }
     }
 
-    void adjust_contrast(Mat& img, double contrast_factor){
+    static void adjust_contrast(Mat& img, double contrast_factor){
 
         CV_Assert(contrast_factor >= 0);
 
@@ -48,7 +48,7 @@ namespace cv {
         merge(new_channels, img);
     }
 
-    void adjust_saturation(Mat& img, double saturation_factor){
+    static void adjust_saturation(Mat& img, double saturation_factor){
         CV_Assert(saturation_factor >= 0);
 
         int num_channels = img.channels();
@@ -63,7 +63,7 @@ namespace cv {
         img = saturation_factor * img + (1-saturation_factor) * gray;
     }
 
-    void adjust_hue(Mat& img, double hue_factor) {
+    static void adjust_hue(Mat& img, double hue_factor) {
         // FIXME: the range of hue_factor needs to be modified
         CV_Assert(hue_factor >= 0);
 
