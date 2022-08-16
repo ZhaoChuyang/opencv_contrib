@@ -152,6 +152,17 @@ class RandomIoUCrop(nn.Module):
                 return image, target
 
 
+class Resize(nn.Module):
+    def __init__(self, dims=(300, 300)):
+        self.dims = dims
+
+    def forward(self, image: Tensor, target: Optional[Dict[str, Tensor]] = None):
+        new_image = F.resize(image, self.dims)
+        old_dims = torch.FloatTensor([image.width, image.height, image.width, image.height]).unsqueeze(0)
+        target['boxes'] = target['boxes'] / old_dims  # percent coordinates
+        return new_image, target
+
+
 class RandomZoomOut(nn.Module):
     def __init__(
             self, fill: Optional[List[float]] = None, side_range: Tuple[float, float] = (1.0, 4.0), p: float = 0.5
