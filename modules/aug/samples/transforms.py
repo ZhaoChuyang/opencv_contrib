@@ -154,6 +154,7 @@ class RandomIoUCrop(nn.Module):
 
 class Resize(nn.Module):
     def __init__(self, dims=(300, 300)):
+        super().__init__()
         self.dims = dims
 
     def forward(self, image: Tensor, target: Optional[Dict[str, Tensor]] = None):
