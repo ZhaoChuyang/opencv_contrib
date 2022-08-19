@@ -4,6 +4,9 @@
 
 
 namespace cv{
+
+    extern RNG rng;
+
     namespace det{
         Compose::Compose(std::vector<Ptr<Transform> >& transforms):
         transforms(transforms){};
@@ -23,7 +26,7 @@ namespace cv{
         };
 
         void RandomFlip::call(InputArray _src, OutputArray _dst, std::vector<cv::Rect>& target) const{
-            RNG rng = RNG(getTickCount());
+//            RNG rng = RNG(getTickCount());
             bool flag = rng.uniform(0., 1.) < p;
 
             Mat src = _src.getMat();

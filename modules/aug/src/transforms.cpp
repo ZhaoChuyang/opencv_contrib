@@ -3,6 +3,7 @@
 #include <iostream>
 
 namespace cv{
+    extern RNG rng;
 
     static void getRandomCropParams(int h, int w, int th, int tw, int* x, int* y);
     static void getRandomResizedCropParams(int height, int width, const Vec2d& scale, const Vec2d& ratio, Rect& rect);
@@ -35,9 +36,10 @@ namespace cv{
         int x, y;
         getRandomCropParams(src.rows, src.cols, sz.height, sz.width, &x, &y);
         Mat RoI(src, Rect(x, y, sz.width, sz.height));
-//        RoI.copyTo(dst);
+        RoI.copyTo(_dst);
         // inplace operation
-        _dst.move(RoI);
+        // NOTE: inplace operation not works in converting from python to numpy
+//        _dst.move(RoI);
     }
 
 //    CV_EXPORTS_W void randomCropV1(InputOutputArray _src, const Size& sz, const Vec4i& padding, bool pad_if_need, int fill, int padding_mode){
@@ -78,7 +80,7 @@ namespace cv{
 //        srand((unsigned)time(&t));
 //        (*x) = static_cast<int> (rand() / static_cast<float> (RAND_MAX) * (w-tw+1));
 //        (*y) = static_cast<int> (rand()/ static_cast<float> (RAND_MAX) * (h-th+1));
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
         (*x) = rng.uniform(0, w-tw+1);
         (*y) = rng.uniform(0, h-th+1);
 
@@ -104,7 +106,7 @@ namespace cv{
          */
 
         // initialize RNG with seed of current tick count
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
         bool flag = rng.uniform(0., 1.) < p;
 
         Mat src = _src.getMat();
@@ -208,7 +210,7 @@ namespace cv{
         int area = height * width;
 
         // initialize random value generator
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
 
         for (int i = 0; i < 10; i++) {
             double target_area = rng.uniform(scale[0], scale[1]) * area;
@@ -257,7 +259,7 @@ namespace cv{
 
     void colorJitter(InputArray _src, OutputArray _dst, const Vec2d& brightness, const Vec2d& contrast, const Vec2d& saturation, const Vec2d& hue){
         // TODO: check input values
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
 
         Mat src = _src.getMat();
 
@@ -302,7 +304,7 @@ namespace cv{
 
     void randomRotation(InputArray _src, OutputArray _dst, const Vec2d& degrees, int interpolation, bool expand, const Point2f& center, int fill){
         Mat src = _src.getMat();
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
         // TODO: check the validation of degrees
         double angle = rng.uniform(degrees[0], degrees[1]);
 
@@ -344,7 +346,7 @@ namespace cv{
     }
 
     void randomGrayScale(InputArray _src, OutputArray _dst, double p){
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
         if(rng.uniform(0.0, 1.0) < p){
             grayScale(_src, _dst, _src.channels());
             return;
@@ -363,7 +365,7 @@ namespace cv{
     void randomErasing(InputArray _src, OutputArray _dst, double p, const Vec2d& scale, const Vec2d& ratio, const Scalar& value, bool inplace){
         // TODO: check the range of input values
         // TODO: currently inplace takes no effect
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
         Mat src = _src.getMat();
         if(rng.uniform(0., 1.) >= p){
             _dst.move(src);
@@ -395,7 +397,7 @@ namespace cv{
         int area = height * width;
 
         // initialize random value generator
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
 
         for (int i = 0; i < 10; i++) {
             double target_area = rng.uniform(scale[0], scale[1]) * area;
@@ -467,7 +469,7 @@ namespace cv{
     }
 
     void gaussianBlur(InputArray src, OutputArray dst, const Size& kernel_size, const Vec2f& sigma){
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
         float sigmaX = rng.uniform(sigma[0], sigma[1]);
         GaussianBlur(src, dst, kernel_size, sigmaX);
     }
@@ -514,7 +516,7 @@ namespace cv{
     static void getAffineMatrix(Mat mat, float angle, float tx, float ty, float scale, float shear_x, float shear_y, int cx, int cy){
         float* data = mat.ptr<float>(0);
 
-        // convert from degree to radians
+        // convert from degrees to radians
         angle = (CV_PI * angle) / 180;
         shear_x = (CV_PI * shear_x) / 180;
         shear_y = (CV_PI * shear_y) / 180;
@@ -528,7 +530,7 @@ namespace cv{
     }
 
     static void getRandomAffineParams(const Size& size, const Vec2f& degrees, const Vec2f& translations, const Vec2f& scales, const Vec4f& shears, float* angle, float* translation_x, float* translation_y, float* scale, float* shear_x, float* shear_y){
-        RNG rng = RNG(getTickCount());
+//        RNG rng = RNG(getTickCount());
 
         if(degrees == Vec2f(0, 0)) {
             *angle = 0;

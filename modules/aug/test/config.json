@@ -1,0 +1,22 @@
+{
+"tests": [
+  {
+    "namespace": "aug",
+    "method": "RandomCrop",
+    "init_args": {
+      "size": [200, 200],
+      "padding": [0,0,0,0],
+      "pad_if_needed": false,
+      "fill": 0,
+      "padding_mode": "constant"
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+      "i": 0,
+      "j": 0
+    },
+    "seed": 0,
+    "save_path": "aug/random_crop_test_0.jpg"
+  }
+]
+}

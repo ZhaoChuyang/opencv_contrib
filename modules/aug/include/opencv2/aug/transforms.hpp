@@ -6,8 +6,6 @@
 #include <vector>
 
 namespace cv{
-
-
     /*
      * Base class for all augmentation classes
      */
