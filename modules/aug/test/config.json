@@ -17,6 +17,48 @@
     },
     "seed": 0,
     "save_path": "aug/random_crop_test_0.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "RandomCrop",
+    "init_args": {
+      "size": [200, 200],
+      "padding": [30, 10, 40, 20],
+      "pad_if_needed": false,
+      "fill": 0,
+      "padding_mode": "constant"
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+      "i": 0,
+      "j": 0
+    },
+    "seed": 0,
+    "save_path": "aug/random_crop_test_1.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "RandomVerticalFlip",
+    "init_args": {
+      "p": 1
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+    },
+    "seed": 0,
+    "save_path": "aug/random_flip_test_2.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "Resize",
+    "init_args": {
+      "size": [128, 256]
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+    },
+    "seed": 0,
+    "save_path": "aug/resize_test_3.jpg"
   }
 ]
 }

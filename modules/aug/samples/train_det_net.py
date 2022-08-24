@@ -1,4 +1,6 @@
 import os
+import time
+
 import numpy as np
 import torch
 from PIL import Image
@@ -184,8 +186,10 @@ def main():
 
     parameters = model.parameters()
     optimizer = torch.optim.AdamW(parameters, lr=args.lr)
-
-    train(1, device, model, train_loader, optimizer)
+    start = time.time()
+    train(2, device, model, train_loader, optimizer)
+    end = time.time()
+    print(end-start)
 
 
 if __name__ == '__main__':

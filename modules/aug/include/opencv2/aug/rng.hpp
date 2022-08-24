@@ -6,10 +6,12 @@
 #define OPENCV_AUG_RNG_HPP
 
 namespace cv{
-    extern uint64 state;
-    extern cv::RNG rng;
+    namespace imgaug{
+        extern uint64 state;
+        extern cv::RNG rng;
 
-    CV_EXPORTS_W void setSeed(uint64 seed);
+        CV_EXPORTS_W void setSeed(uint64 seed);
+    }
 }
 
 

@@ -19,6 +19,7 @@ except ImportError:
 
 from torchvision.utils import _log_api_usage_once
 from torchvision.transforms import functional as F
+from torchvision.transforms import *
 from torchvision.transforms.functional import _interpolation_modes_from_int, InterpolationMode
 
 import torchvision.transforms as T

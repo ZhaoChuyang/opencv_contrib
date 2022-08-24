@@ -6,30 +6,31 @@
 #define OPENCV_TRANSFORMS_DET_HPP
 
 namespace cv{
-    namespace det{
-        class CV_EXPORTS_W Transform{
-        public:
-            CV_WRAP virtual void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const = 0;
-            CV_WRAP virtual ~Transform() = default;
-        };
+    namespace imgaug{
+        namespace det{
+            class CV_EXPORTS_W Transform{
+            public:
+                CV_WRAP virtual void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const = 0;
+                CV_WRAP virtual ~Transform() = default;
+            };
 
-        class CV_EXPORTS_W Compose{
-        public:
-            CV_WRAP explicit Compose(std::vector<cv::Ptr<cv::det::Transform> >& transforms);
-            CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
+            class CV_EXPORTS_W Compose{
+            public:
+                CV_WRAP explicit Compose(std::vector<cv::Ptr<cv::imgaug::det::Transform> >& transforms);
+                CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
 
-            std::vector<cv::Ptr<cv::det::Transform> > transforms;
-        };
+                std::vector<cv::Ptr<cv::imgaug::det::Transform> > transforms;
+            };
 
-        class CV_EXPORTS_W RandomFlip: cv::det::Transform{
-        public:
-            CV_WRAP explicit RandomFlip(int flipCode=0, float p=0.5);
-            CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
-            void flipBoundingBox(std::vector<cv::Rect>& target, const Size& size) const;
+            class CV_EXPORTS_W RandomFlip: cv::imgaug::det::Transform{
+            public:
+                CV_WRAP explicit RandomFlip(int flipCode=0, float p=0.5);
+                CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
+                void flipBoundingBox(std::vector<cv::Rect>& target, const Size& size) const;
 
-            int flipCode;
-            float p;
-        };
+                int flipCode;
+                float p;
+            };
 
 //        class CV_EXPORTS_W RandomCrop: cv::det::Transform{
 //        public:
@@ -43,24 +44,26 @@ namespace cv{
 //            int padding_mode;
 //        };
 
-        class CV_EXPORTS_W Resize: cv::det::Transform{
-        public:
-            CV_WRAP explicit Resize(const Size& size, int interpolation=INTER_NEAREST);
-            CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
-            void resizeBoundingBox(std::vector<cv::Rect>& target, const Size& imgSize) const;
+            class CV_EXPORTS_W Resize: cv::imgaug::det::Transform{
+            public:
+                CV_WRAP explicit Resize(const Size& size, int interpolation=INTER_NEAREST);
+                CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
+                void resizeBoundingBox(std::vector<cv::Rect>& target, const Size& imgSize) const;
 
-            const Size size;
-            int interpolation;
-        };
+                const Size size;
+                int interpolation;
+            };
 
-        class CV_EXPORTS_W Convert: cv::det::Transform{
-        public:
-            CV_WRAP explicit Convert(int code);
-            CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
+            class CV_EXPORTS_W Convert: cv::imgaug::det::Transform{
+            public:
+                CV_WRAP explicit Convert(int code);
+                CV_WRAP void call(InputArray src, OutputArray dst, CV_IN_OUT std::vector<cv::Rect>& target) const;
 
-            int code;
-        };
+                int code;
+            };
+        }
     }
+
 }
 
 #endif //OPENCV_TRANSFORMS_DET_HPP
