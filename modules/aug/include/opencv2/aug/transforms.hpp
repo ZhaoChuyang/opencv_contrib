@@ -113,18 +113,18 @@ namespace cv{
             Vec2d hue;
         };
 
-        CV_EXPORTS void randomRotation(InputArray src, OutputArray dst, const Vec2d& degrees, int interpolation=INTER_NEAREST, bool expand=false, const Point2f& center=Point2f(), int fill=0);
+        CV_EXPORTS void randomRotation(InputArray src, OutputArray dst, const Vec2d& degrees, int interpolation=INTER_LINEAR, bool expand=false, const Point2f& center=Point2f(), const Scalar& fill=Scalar(0));
 
         class CV_EXPORTS_W RandomRotation : public Transform {
         public:
-            CV_WRAP explicit RandomRotation(const Vec2d& degrees, int interpolation=INTER_NEAREST, bool expand=false, const Point2f& center=Point2f(), int fill=0);
+            CV_WRAP explicit RandomRotation(const Vec2d& degrees, int interpolation=INTER_LINEAR, bool expand=false, const Point2f& center=Point2f(), const Scalar& fill=Scalar());
             CV_WRAP void call(InputArray src, OutputArray dst) const override;
 
             Vec2d degrees;
             int interpolation;
             bool expand;
             Point2f center;
-            int fill;
+            Scalar fill;
         };
 
         class CV_EXPORTS_W GrayScale : public Transform {
@@ -171,9 +171,9 @@ namespace cv{
 
         CV_EXPORTS void gaussianBlur(InputArray src, OutputArray dst, const Size& kernel_size, const Vec2f& sigma=Vec2f(0.1, 2.0));
 
-        class CV_EXPORTS_W GaussianBlurAug : public Transform {
+        class CV_EXPORTS_W GaussianBlur : public Transform {
         public:
-            CV_WRAP explicit GaussianBlurAug(const Size& kernel_size, const Vec2f& sigma=Vec2f(0.1, 2.0));
+            CV_WRAP explicit GaussianBlur(const Size& kernel_size, const Vec2f& sigma=Vec2f(0.1, 2.0));
             CV_WRAP void call(InputArray src, OutputArray dst) const override;
 
             Size kernel_size;

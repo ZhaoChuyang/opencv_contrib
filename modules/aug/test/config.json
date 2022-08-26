@@ -59,6 +59,84 @@
     },
     "seed": 0,
     "save_path": "aug/resize_test_3.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "CenterCrop",
+    "init_args": {
+      "size": [300, 400]
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+    },
+    "seed": 0,
+    "save_path": "aug/center_crop_test_4.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "Pad",
+    "init_args": {
+      "padding": [30, 10, 40, 20]
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+    },
+    "seed": 0,
+    "save_path": "aug/pad_test_5.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "RandomResizedCrop",
+    "init_args": {
+      "size": [512, 1024]
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+      "i": 26,
+      "j": 27,
+      "w":467,
+      "h": 405
+    },
+    "seed": 10,
+    "save_path": "aug/random_resized_crop_test_6.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "RandomRotation",
+    "init_args": {
+      "degrees": [-10, 10]
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+      "angle": 6.97172069
+    },
+    "seed": 5,
+    "save_path": "aug/random_rotation_test_7.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "Grayscale",
+    "init_args": {
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+    },
+    "seed": 0,
+    "save_path": "aug/gray_scale_test_8.jpg"
+  },
+  {
+    "namespace": "aug",
+    "method": "GaussianBlur",
+    "init_args": {
+      "kernel_size": [5, 5]
+    },
+    "img_path": "aug/lena.jpg",
+    "runtime_args": {
+      "sigma": 1.13694
+    },
+    "seed": 15,
+    "save_path": "aug/gaussian_blur_test_9.jpg"
   }
 ]
 }
+

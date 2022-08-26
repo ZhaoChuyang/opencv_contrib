@@ -54,6 +54,47 @@ class RandomCrop(T.RandomCrop):
         return img
 
 
+class RandomResizedCrop(RandomResizedCrop):
+    def forward(self, img, i, j, h, w):
+        """
+        Args:
+            img (PIL Image or Tensor): Image to be cropped and resized.
+        Returns:
+            PIL Image or Tensor: Randomly cropped and resized image.
+        """
+        return F.resized_crop(img, i, j, h, w, self.size, self.interpolation)
+
+
+class RandomRotation(RandomRotation):
+    def forward(self, img, angle):
+        """
+        Args:
+            img (PIL Image or Tensor): Image to be rotated.
+        Returns:
+            PIL Image or Tensor: Rotated image.
+        """
+        fill = self.fill
+        channels, _, _ = F.get_dimensions(img)
+        if isinstance(img, Tensor):
+            if isinstance(fill, (int, float)):
+                fill = [float(fill)] * channels
+            else:
+                fill = [float(f) for f in fill]
+
+        return F.rotate(img, angle, self.resample, self.expand, self.center, fill)
+
+
+class GaussianBlur(GaussianBlur):
+    def forward(self, img: Tensor, sigma) -> Tensor:
+        """
+        Args:
+            img (PIL Image or Tensor): image to be blurred.
+        Returns:
+            PIL Image or Tensor: Gaussian blurred image
+        """
+        return F.gaussian_blur(img, self.kernel_size, [sigma, sigma])
+
+
 def main():
 
     root = "/Users/bytedance/Workspace/opencv_extra/testdata/cv"

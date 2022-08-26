@@ -305,20 +305,25 @@ namespace cv{
             colorJitter(src, dst, brightness, contrast, saturation, hue);
         }
 
-        void randomRotation(InputArray _src, OutputArray _dst, const Vec2d& degrees, int interpolation, bool expand, const Point2f& center, int fill){
+        void randomRotation(InputArray _src, OutputArray _dst, const Vec2d& degrees, int interpolation, bool expand, const Point2f& center, const Scalar& fill){
             Mat src = _src.getMat();
 //        RNG rng = RNG(getTickCount());
             // TODO: check the validation of degrees
             double angle = rng.uniform(degrees[0], degrees[1]);
 
             Point2f pt(src.cols/2., src.rows/2.);
-            if(center == Point2f()) pt = center;
+            if(center != Point2f()) pt = center;
+
             Mat r = getRotationMatrix2D(pt, angle, 1.0);
+
             // TODO: auto expand dst size to fit the rotated image
-            warpAffine(src, _dst, r, Size(src.cols, src.rows), interpolation, BORDER_CONSTANT, fill);
+//            warpAffine(src, _dst, r, src.size(), interpolation, BORDER_CONSTANT, fill);
+//            _dst.create(src.size(), src.type());
+//            Mat dst = _dst.getMat();
+            warpAffine(src, _dst, r, src.size());
         }
 
-        RandomRotation::RandomRotation(const Vec2d& degrees, int interpolation, bool expand, const Point2f& center, int fill):
+        RandomRotation::RandomRotation(const Vec2d& degrees, int interpolation, bool expand, const Point2f& center, const Scalar& fill):
                 degrees(degrees),
                 interpolation(interpolation),
                 expand(expand),
@@ -474,14 +479,15 @@ namespace cv{
         void gaussianBlur(InputArray src, OutputArray dst, const Size& kernel_size, const Vec2f& sigma){
 //        RNG rng = RNG(getTickCount());
             float sigmaX = rng.uniform(sigma[0], sigma[1]);
-            GaussianBlur(src, dst, kernel_size, sigmaX);
+            std::cout << sigmaX << std::endl;
+            cv::GaussianBlur(src, dst, kernel_size, sigmaX);
         }
 
-        GaussianBlurAug::GaussianBlurAug(const Size &kernel_size, const Vec2f &sigma):
+        GaussianBlur::GaussianBlur(const Size &kernel_size, const Vec2f &sigma):
                 kernel_size(kernel_size),
                 sigma(sigma){};
 
-        void GaussianBlurAug::call(InputArray src, OutputArray dst) const{
+        void GaussianBlur::call(InputArray src, OutputArray dst) const{
             gaussianBlur(src, dst, kernel_size, sigma);
         }
 

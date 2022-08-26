@@ -21,9 +21,12 @@ int main(int argv, char** argc) {
         std::string filename = "/Users/bytedance/Workspace/opencv/samples/data/lena.jpg";
         cv::Mat src = cv::imread(filename);
         cv::Mat dst;
-        cv::RandomCrop aug(cv::Size(300, 300));
+//        cv::imgaug::RandomRotation aug(cv::Vec2d(-10, 10));
 
-        aug.call(src, dst);
+//        aug.call(src, dst);
+        uint64 seed = 15;
+        cv::imgaug::setSeed(seed);
+        cv::imgaug::randomRotation(src, dst, cv::Vec2d(-20, 20));
         cv::imshow("lena_dst.png", dst);
         cv::waitKey(0);
 //        cv::det::RandomFlip aug(-1, 0.5);
