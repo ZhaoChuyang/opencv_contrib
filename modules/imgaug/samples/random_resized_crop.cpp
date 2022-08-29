@@ -1,7 +1,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/aug.hpp>
+#include <opencv2/imgaug.hpp>
 #include <iostream>
 #include <vector>
 
@@ -12,7 +12,7 @@ int main(int argv, char** argc) {
     cv::Mat src = cv::imread(filename);
     cv::Mat dst;
 
-    cv::randomResizedCrop(src, dst, cv::Size(300, 300));
+    cv::imgaug::randomResizedCrop(src, dst, cv::Size(300, 300));
     cv::imshow("lena.png", dst);
     cv::waitKey(0);
 

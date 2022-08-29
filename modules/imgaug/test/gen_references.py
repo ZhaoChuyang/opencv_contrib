@@ -98,19 +98,30 @@ class GaussianBlur(GaussianBlur):
 def main():
 
     root = "/Users/bytedance/Workspace/opencv_extra/testdata/cv"
-    with open("/Users/bytedance/Workspace/opencv/opencv_contrib/modules/aug/test/config.json", "r") as fb:
+    with open("/Users/bytedance/Workspace/opencv/opencv_contrib/modules/imgaug/test/config.json", "r") as fb:
         config = json.load(fb)
 
     for test_sample in config["tests"]:
         namespace = test_sample["namespace"]
         method_name = test_sample["method"]
-        if namespace == "aug":
+        if namespace == "imgaug":
             method = globals()[method_name](**test_sample["init_args"])
             img_path = os.path.join(root, test_sample["img_path"])
             img = Image.open(img_path)
-            img = method(img, **test_sample["runtime_args"])
+            # img = method(img, **test_sample["runtime_args"])
+            img = Compose([
+                ToTensor(),
+                Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ])(img)
+            import numpy as np
+            img = np.asarray(img).transpose([1, 2, 0])
+
+            img = Image.fromarray(np.uint8(np.clip(img * 255, 0, 255)))
+
             save_path = os.path.join(root, test_sample["save_path"])
+            save_path = os.path.join(root, "imgaug/normalize_test_10.jpg")
             img.save(save_path)
+            break
 
 
 if __name__ == '__main__':

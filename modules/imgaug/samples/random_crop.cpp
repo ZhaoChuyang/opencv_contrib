@@ -1,7 +1,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/aug.hpp>
+#include <opencv2/imgaug.hpp>
 #include <iostream>
 #include <vector>
 
@@ -21,15 +21,17 @@ int main(int argv, char** argc) {
         std::string filename = "/Users/bytedance/Workspace/opencv/samples/data/lena.jpg";
         cv::Mat src = cv::imread(filename);
         cv::Mat dst;
-//        cv::imgaug::RandomRotation aug(cv::Vec2d(-10, 10));
+//        cv::imgaug::RandomRotation imgaug(cv::Vec2d(-10, 10));
 
-//        aug.call(src, dst);
+//        imgaug.call(src, dst);
         uint64 seed = 15;
         cv::imgaug::setSeed(seed);
-        cv::imgaug::randomRotation(src, dst, cv::Vec2d(-20, 20));
+//        cv::imgaug::randomRotation(src, dst, cv::Vec2d(-20, 20));
+        cv::imgaug::Resize aug(cv::Size(300, 300));
+        aug.call(src, dst);
         cv::imshow("lena_dst.png", dst);
         cv::waitKey(0);
-//        cv::det::RandomFlip aug(-1, 0.5);
+//        cv::det::RandomFlip imgaug(-1, 0.5);
 //
 //        std::vector<cv::Rect> target{
 //                cv::Rect{100, 200, 100, 200},
@@ -41,7 +43,7 @@ int main(int argv, char** argc) {
 //        cv::rectangle(src_copy, pt1, pt2, cv::Scalar(), 2);
 //        cv::imshow("lena_src.png", src_copy);
 //
-//        aug.call(src, dst, target);
+//        imgaug.call(src, dst, target);
 //
 //        cv::Point pt3{target[0].x, target[0].y};
 //        cv::Point pt4{target[0].x + target[0].width, target[0].y + target[0].height};
