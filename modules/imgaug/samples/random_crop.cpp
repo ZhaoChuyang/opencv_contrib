@@ -24,32 +24,39 @@ int main(int argv, char** argc) {
 //        cv::imgaug::RandomRotation imgaug(cv::Vec2d(-10, 10));
 
 //        imgaug.call(src, dst);
-        uint64 seed = 15;
-        cv::imgaug::setSeed(seed);
+//        uint64 seed = 15;
+//        cv::imgaug::setSeed(seed);
 //        cv::imgaug::randomRotation(src, dst, cv::Vec2d(-20, 20));
-        cv::imgaug::Resize aug(cv::Size(300, 300));
-        aug.call(src, dst);
-        cv::imshow("lena_dst.png", dst);
-        cv::waitKey(0);
-//        cv::det::RandomFlip imgaug(-1, 0.5);
-//
-//        std::vector<cv::Rect> target{
-//                cv::Rect{100, 200, 100, 200},
-//        };
-//        cv::Point pt1{target[0].x, target[0].y};
-//        cv::Point pt2{target[0].x + target[0].width, target[0].y + target[0].height};
-//        cv::Mat src_copy;
-//        src.copyTo(src_copy);
-//        cv::rectangle(src_copy, pt1, pt2, cv::Scalar(), 2);
-//        cv::imshow("lena_src.png", src_copy);
-//
-//        imgaug.call(src, dst, target);
-//
-//        cv::Point pt3{target[0].x, target[0].y};
-//        cv::Point pt4{target[0].x + target[0].width, target[0].y + target[0].height};
-//        cv::rectangle(dst, pt3, pt4, cv::Scalar(), 2);
+//        cv::imgaug::Resize aug(cv::Size(300, 300));
+//        aug.call(src, dst);
 //        cv::imshow("lena_dst.png", dst);
 //        cv::waitKey(0);
+//        cv::det::RandomFlip imgaug(-1, 0.5);
+
+        cv::imgaug::det::RandomTranslation aug(cv::Vec2d(30, 30));
+//        cv::imgaug::det::Resize aug(cv::Size(200, 200));
+
+        std::vector<cv::Rect> bboxes{
+                cv::Rect{100, 200, 100, 200},
+        };
+        std::vector<int> labels {1};
+
+        cv::Point pt1{bboxes[0].x, bboxes[0].y};
+        cv::Point pt2{bboxes[0].x + bboxes[0].width, bboxes[0].y + bboxes[0].height};
+
+        cv::Mat src_copy;
+        src.copyTo(src_copy);
+
+        cv::rectangle(src_copy, pt1, pt2, cv::Scalar(), 2);
+        cv::imshow("lena_src.png", src_copy);
+
+        aug.call(src, dst, bboxes, labels);
+
+        cv::Point pt3{bboxes[0].x, bboxes[0].y};
+        cv::Point pt4{bboxes[0].x + bboxes[0].width, bboxes[0].y + bboxes[0].height};
+        cv::rectangle(dst, pt3, pt4, cv::Scalar(), 2);
+        cv::imshow("lena_dst.png", dst);
+        cv::waitKey(0);
     }
     return 0;
 }
