@@ -16,8 +16,8 @@
 //    cv::randomFlip(src, dst);
 //}
 
-int main(int argv, char** argc) {
-    for(int i=0; i<5; i++) {
+void det_test() {
+    for(int i=0; i<1; i++) {
         std::string filename = "/Users/bytedance/Workspace/opencv/samples/data/lena.jpg";
         cv::Mat src = cv::imread(filename);
         cv::Mat dst;
@@ -58,5 +58,22 @@ int main(int argv, char** argc) {
         cv::imshow("lena_dst.png", dst);
         cv::waitKey(0);
     }
+}
+
+void imgaug_test(){
+    std::string filename = "/Users/bytedance/Workspace/opencv/samples/data/lena.jpg";
+    cv::Mat src = cv::imread(filename);
+    cv::Mat dst;
+
+    uint64 seed = 15;
+    cv::imgaug::setSeed(seed);
+    cv::imgaug::ColorJitter aug(cv::Vec2d(), cv::Vec2d(), cv::Vec2d(), cv::Vec2d(0, 0.01));
+    aug.call(src, dst);
+    cv::imshow("lena_dst.png", dst);
+    cv::waitKey(0);
+}
+
+int main(int argv, char** argc){
+    imgaug_test();
     return 0;
 }
