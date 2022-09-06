@@ -67,10 +67,10 @@ void imgaug_test(){
 
     uint64 seed = 15;
     cv::imgaug::setSeed(seed);
-    cv::imgaug::ColorJitter aug(cv::Vec2d(), cv::Vec2d(), cv::Vec2d(), cv::Vec2d(0, 0.01));
+    cv::imgaug::ColorJitter aug(cv::Vec2d(0, 2), cv::Vec2d(0, 2), cv::Vec2d(0, 2), cv::Vec2d(-0.5, 0.5));
     aug.call(src, dst);
-    cv::imshow("lena_dst.png", dst);
-    cv::waitKey(0);
+//    cv::imshow("lena_dst.png", dst);
+//    cv::waitKey(0);
 }
 
 int main(int argv, char** argc){
