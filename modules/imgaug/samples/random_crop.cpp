@@ -16,6 +16,14 @@
 //    cv::randomFlip(src, dst);
 //}
 
+void draw_bboxes(cv::Mat& img, std::vector<cv::Rect> bboxes){
+    for(cv::Rect bbox: bboxes){
+        cv::Point tl {bbox.x, bbox.y};
+        cv::Point br {bbox.x + bbox.width, bbox.y + bbox.height};
+        cv::rectangle(img, tl, br, cv::Scalar(0, 255, 0), 2);
+    }
+}
+
 void det_test() {
     for(int i=0; i<1; i++) {
         std::string filename = "/Users/bytedance/Workspace/opencv/samples/data/lena.jpg";
@@ -37,43 +45,63 @@ void det_test() {
 //        cv::imgaug::det::Resize aug(cv::Size(200, 200));
 
         std::vector<cv::Rect> bboxes{
-                cv::Rect{100, 200, 100, 200},
+                cv::Rect{112, 40, 249, 343},
+                cv::Rect{61, 273, 113, 228}
         };
-        std::vector<int> labels {1};
 
-        cv::Point pt1{bboxes[0].x, bboxes[0].y};
-        cv::Point pt2{bboxes[0].x + bboxes[0].width, bboxes[0].y + bboxes[0].height};
+        std::vector<int> labels {1, 2};
 
         cv::Mat src_copy;
         src.copyTo(src_copy);
 
-        cv::rectangle(src_copy, pt1, pt2, cv::Scalar(), 2);
+        draw_bboxes(src_copy, bboxes);
         cv::imshow("lena_src.png", src_copy);
 
         aug.call(src, dst, bboxes, labels);
 
-        cv::Point pt3{bboxes[0].x, bboxes[0].y};
-        cv::Point pt4{bboxes[0].x + bboxes[0].width, bboxes[0].y + bboxes[0].height};
-        cv::rectangle(dst, pt3, pt4, cv::Scalar(), 2);
+        draw_bboxes(dst, bboxes);
         cv::imshow("lena_dst.png", dst);
         cv::waitKey(0);
     }
 }
 
 void imgaug_test(){
+    cv::Mat src = imread(cv::samples::findFile("lena.jpg"), cv::IMREAD_COLOR);
+    cv::Mat dst;
+    cv::imgaug::RandomCrop randomCrop(cv::Size(300, 300));
+    cv::imgaug::RandomFlip randomFlip(1);
+    cv::imgaug::Resize resize(cv::Size(224, 224));
+    std::vector<cv::Ptr<cv::imgaug::Transform> > transforms{&randomCrop, &randomFlip, &resize};
+    cv::imgaug::Compose aug(transforms);
+    aug.call(src, dst);
+
+//    uint64 seed = 15;
+//    cv::imgaug::setSeed(seed);
+//    cv::imgaug::ColorJitter aug(cv::Vec2d(0, 2), cv::Vec2d(0, 2), cv::Vec2d(0, 2), cv::Vec2d(-0.5, 0.5));
+//    aug.call(src, dst);
+    cv::imshow("lena_dst.png", dst);
+    cv::waitKey(0);
+    cv::imwrite("/Users/bytedance/Desktop/out.jpg", dst);
+}
+
+static void onMouse(int event, int x, int y, int, void*){
+    if( event != cv::EVENT_LBUTTONDOWN )
+        return;
+
+    std::cout << x << " " << y << std::endl;
+}
+
+void get_mouse_click_coordinates(){
     std::string filename = "/Users/bytedance/Workspace/opencv/samples/data/lena.jpg";
     cv::Mat src = cv::imread(filename);
     cv::Mat dst;
-
-    uint64 seed = 15;
-    cv::imgaug::setSeed(seed);
-    cv::imgaug::ColorJitter aug(cv::Vec2d(0, 2), cv::Vec2d(0, 2), cv::Vec2d(0, 2), cv::Vec2d(-0.5, 0.5));
-    aug.call(src, dst);
-//    cv::imshow("lena_dst.png", dst);
-//    cv::waitKey(0);
+    cv::imshow("src", src);
+    cv::setMouseCallback("src", onMouse, nullptr);
+    cv::waitKey(0);
 }
 
 int main(int argv, char** argc){
-    imgaug_test();
+//    get_mouse_click_coordinates();
+    det_test();
     return 0;
 }
