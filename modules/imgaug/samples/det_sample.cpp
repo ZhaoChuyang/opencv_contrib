@@ -39,5 +39,8 @@ int main(){
     imshow("dst", dst);
     waitKey(0);
 
+    imwrite("det_src.jpg", ori_src);
+    imwrite("det_rotation_out.jpg", dst);
+
     return 0;
 }
