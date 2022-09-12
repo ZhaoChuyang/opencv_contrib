@@ -46,5 +46,7 @@ int main(){
     imshow("dst", dst);
     waitKey(0);
 
+    imwrite("/Users/bytedance/Desktop/det_compose_out.jpg", dst, {cv::IMWRITE_JPEG_QUALITY, 50});
+
     return 0;
 }

@@ -81,7 +81,7 @@ void imgaug_test(){
 //    aug.call(src, dst);
     cv::imshow("lena_dst.png", dst);
     cv::waitKey(0);
-    cv::imwrite("/Users/bytedance/Desktop/out.jpg", dst);
+    cv::imwrite("/Users/bytedance/Desktop/compose_out.jpg", dst, {cv::IMWRITE_JPEG_QUALITY, 50});
 }
 
 static void onMouse(int event, int x, int y, int, void*){
@@ -102,6 +102,15 @@ void get_mouse_click_coordinates(){
 
 int main(int argv, char** argc){
 //    get_mouse_click_coordinates();
-    det_test();
+//    det_test();
+    using namespace cv;
+    imgaug_test();
+//    imgaug::RandomCrop randomCrop(cv::Size(300, 300));
+//    Mat src = imread(samples::findFile("lena.jpg"), IMREAD_COLOR);
+//    Mat dst;
+//    randomCrop.call(src, dst);
+
+//    imwrite("/Users/bytedance/Desktop/lena.jpg", src, {cv::IMWRITE_JPEG_QUALITY, 50});
+
     return 0;
 }

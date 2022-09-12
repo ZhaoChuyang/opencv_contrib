@@ -39,5 +39,8 @@ int main(){
     imshow("dst", dst);
     waitKey(0);
 
+    imwrite("/Users/bytedance/Desktop/det_src.jpg", ori_src, {cv::IMWRITE_JPEG_QUALITY, 50});
+    imwrite("/Users/bytedance/Desktop/det_rotation_out.jpg", dst, {cv::IMWRITE_JPEG_QUALITY, 50});
+
     return 0;
 }
