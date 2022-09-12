@@ -4,6 +4,7 @@ Data augmentation with imgaug in object detection {#tutorial_imgaug_object_detec
 @tableofcontents
 
 @prev_tutorial{tutorial_imgaug_basic_usage}
+@next_tutorial{tutorial_imgaug_pytorch}
 
 |    |    |
 | -: | :- |
@@ -81,7 +82,7 @@ The augmented image and its annotation are as follows:
 
 ![](images/det_rotation_out.jpg)
 
-Full code of this example:
+Complete code of this example:
 @include imgaug/samples/det_sample.cpp.
 
 @end_toggle
@@ -138,7 +139,7 @@ The augmented image and its annotation are as follows:
 
 ![](images/det_rotation_out.png)
 
-Full code of this example:
+Complete code of this example:
 @include imgaug/samples/det_sample.cpp
 
 @end_toggle
@@ -176,7 +177,7 @@ The augmented image and its annotation are as follows:
 
 ![](images/det_compose_out.png)
 
-Full code of this example:
+Complete code of this example:
 @include imgaug/samples/det_compose_sample.cpp
 
 @end_toggle
@@ -211,7 +212,7 @@ The augmented image and its annotation are as follows:
 
 ![](images/det_compose_out.png)
 
-Full code of this example:
+Complete code of this example:
 @include imgaug/samples/det_compose_sample.cpp
 
 @end_toggle
