@@ -10,19 +10,22 @@ Data augmentation with imgaug in object detection {#tutorial_imgaug_object_detec
 | Author | Chuyang Zhao |
 | Compatibility | OpenCV >= 4.0 |
 
-Goal
-----
-In this tutorial, you will learn:
-- How to use imgaug to perform data augmentation for data in object detection task
 
-Basics
+Introduction
 ------
 In the previous tutorial, we demonstrate how to use imgaug to perform transforms on pure images.
 In some tasks, the inputs contains not only images but also the annotations. We extend the imgaug
 module to support most of the main stream computer vision tasks. Here we demonstrate how to use imgaug for
 object detection.
 
-The inputs of object detection task contains source input image, the annotated bounding boxes, and the class labels
+
+Goal
+----
+In this tutorial, you will learn:
+- How to use imgaug to perform data augmentation for data in object detection task
+
+
+The inputs of object detection task contain source input image, the annotated bounding boxes, and the class labels
 for each bounding box. In C++, the input image is represented as cv::Mat, the annotated bounding boxes can be represented
 as `std::vector<cv::Rect>` in which each bounding box is represented as a cv::Rect. The annotated labels for objects in
 bounding boxes can be represented as `std::vector<int>`.
